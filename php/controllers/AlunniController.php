@@ -19,7 +19,6 @@ class AlunniController
       }
 
       $result = $mysqli_connection->query($query);
-      $results = $result->fetch_all(MYSQLI_ASSOC);
 
       if($result){
         $response->getBody()->write(json_encode(array("message"=>"success")));
@@ -32,17 +31,17 @@ class AlunniController
     }
     else{
       $result = $mysqli_connection->query("SELECT * FROM alunni");
-      $results = $result->fetch_all(MYSQLI_ASSOC);
+      $status = 200;
     }
     
-
+    $results = $result->fetch_all(MYSQLI_ASSOC);
     $response->getBody()->write(json_encode($results));
     return $response->withHeader("Content-type", "application/json")->withStatus($status);
   }
 
   public function view(Request $request, Response $response, $args){
     $mysqli_connection = new MySQLi('my_mariadb', 'root', 'ciccio', 'scuola');
-    $result = $mysqli_connection->query("SELECT * FROM alunni WHERE id = $args[id]");
+    $result = $mysqli_connection->query("SELECT * FROM alunni WHERE id = '$args[id]'");
     $results = $result->fetch_all(MYSQLI_ASSOC);
 
     $response->getBody()->write(json_encode($results));
@@ -52,7 +51,7 @@ class AlunniController
   public function create(Request $request, Response $response, $args){
     $body = json_decode($request->getBody()->getContents(), true);
     $mysqli_connection = new MySQLi('my_mariadb', 'root', 'ciccio', 'scuola');
-    $query_inserimento = "INSERT INTO alunni(nome, cognome) VALUES('$body[nome]', '$body[cognome]');";
+    $query_inserimento = "INSERT INTO alunni(nome, cognome, cf) VALUES('$body[nome]', '$body[cognome]', '$body[cf]');";
     $result = $mysqli_connection->query($query_inserimento);
     if($result){
       $response->getBody()->write(json_encode(array("message"=>"success")));
@@ -70,7 +69,27 @@ class AlunniController
   public function update(Request $request, Response $response, $args){
     $body = json_decode($request->getBody()->getContents(), true);
     $mysqli_connection = new MySQLi('my_mariadb', 'root', 'ciccio', 'scuola');
-    $query_inserimento = "UPDATE alunni SET nome='$body[nome]', cognome='$body[cognome]' WHERE id = '$args[id]'";
+    $query_inserimento = "UPDATE alunni SET";
+    if(isset($body["nome"])){
+      $query_inserimento .= " nome='$body[nome]'";
+    }
+
+    if(isset($body["cognome"]) && !isset($body["nome"])){
+      $query_inserimento .= " cognome='$body[cognome]'";
+    }
+    else if(isset($body["cognome"])){
+      $query_inserimento .= ", cognome='$body[cognome]'";
+    }
+
+    if(isset($body["cf"]) && !isset($body["nome"]) && !isset($body["cognome"])){
+      $query_inserimento .= " cf='$body[cf]'";
+    }
+    else if(isset($body["cf"])){
+      $query_inserimento .= ", cf='$body[cf]'";
+    }
+
+    $query_inserimento .= " WHERE id = '$args[id]'";
+
     $result = $mysqli_connection->query($query_inserimento);
     if($result){
       $response->getBody()->write(json_encode(array("message"=>"success")));
