@@ -72,23 +72,29 @@ class AlunniController
   public function update(Request $request, Response $response, $args){
     $body = json_decode($request->getBody()->getContents(), true);
     $mysqli_connection = new MySQLi('my_mariadb', 'root', 'ciccio', 'scuola');
+    $primo_inserimento = true;
     $query_inserimento = "UPDATE alunni SET";
     if(isset($body["nome"])){
+      if($primo_inserimento){
+        $primo_inserimento = false;
+      }
       $query_inserimento .= " nome='$body[nome]'";
     }
 
-    if(isset($body["cognome"]) && !isset($body["nome"])){
+    if(isset($body["cognome"])){
+      if(!$primo_inserimento){
+        $query_inserimento .= ",";
+      }
+      $primo_inserimento = false;
       $query_inserimento .= " cognome='$body[cognome]'";
     }
-    else if(isset($body["cognome"])){
-      $query_inserimento .= ", cognome='$body[cognome]'";
-    }
 
-    if(isset($body["cf"]) && !isset($body["nome"]) && !isset($body["cognome"])){
+    if(isset($body["cf"])){
+      if(!$primo_inserimento){
+        $query_inserimento .= ",";
+      }
+      $primo_inserimento = false;
       $query_inserimento .= " cf='$body[cf]'";
-    }
-    else if(isset($body["cf"])){
-      $query_inserimento .= ", cf='$body[cf]'";
     }
 
     $query_inserimento .= " WHERE id = '$args[id]'";
