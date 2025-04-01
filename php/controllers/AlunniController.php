@@ -14,10 +14,13 @@ class AlunniController
         $search = $parametri['search'];
         $query .= " WHERE nome LIKE '%$search%' OR cognome LIKE '%$search%'";
       }
-      if(isset($_GET["sortCol"]) && isset($_GET["sort"])){
+      if(isset($_GET["sortCol"])){
         $sortCol = $parametri["sortCol"];
-        $sort = $parametri["sort"];
-        $query .= " ORDER BY $sortCol $sort";
+        $query .= " ORDER BY $sortCol";
+      }
+      if(isset($_GET["sort"])){
+        $sort = $parametri["sort"] ?? "asc";
+        $query .= " $sort";
       }
 
       $result = $mysqli_connection->query($query);
@@ -96,7 +99,7 @@ class AlunniController
     $result = $mysqli_connection->query($query_inserimento);
     if($result){
       $response->getBody()->write(json_encode(array("message"=>"success")));
-      $status = 200;
+      $status = 204;
     }
     else{
       $response->getBody()->write(json_encode(array("message"=> $mysqli_connection->error)));
