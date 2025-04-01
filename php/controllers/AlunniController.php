@@ -6,16 +6,19 @@ class AlunniController
 {
   public function index(Request $request, Response $response, $args){
     $mysqli_connection = new MySQLi('my_mariadb', 'root', 'ciccio', 'scuola');
-    if(isset($_GET["search"])){
+    
+    $query = "SELECT * FROM alunni";
+    if(isset($_GET["search"]) || isset($_GET["sortCol"])){
       $parametri = $request->getQueryParams();
-      $search = $parametri['search'];
 
-      $query = "SELECT * FROM alunni WHERE nome LIKE '%$search%' OR cognome LIKE '%$search%'";
-
+      if(isset($_GET["search"])){
+        $search = $parametri['search'];
+        $query .= " WHERE nome LIKE '%$search%' OR cognome LIKE '%$search%'";
+      }
       if(isset($_GET["sortCol"]) && isset($_GET["sort"])){
         $sortCol = $parametri["sortCol"];
         $sort = $parametri["sort"];
-        $query .= "ORDER BY $sortCol $sort";
+        $query .= " ORDER BY $sortCol $sort";
       }
 
       $result = $mysqli_connection->query($query);
@@ -30,7 +33,7 @@ class AlunniController
       }
     }
     else{
-      $result = $mysqli_connection->query("SELECT * FROM alunni");
+      $result = $mysqli_connection->query($query);
       $status = 200;
     }
     
@@ -120,10 +123,5 @@ class AlunniController
     
 
     return $response->withHeader("Content-type", "application/json")->withStatus($status);
-  }
-
-  public function search_sort(Request $request, Response $response, $args){
-    $mysqli_connection = new MySQLi('my_mariadb', 'root', 'ciccio', 'scuola');
-    
   }
 }

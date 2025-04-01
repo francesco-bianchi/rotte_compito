@@ -12,7 +12,7 @@ $app->get('/alunni', "AlunniController:index");
 
 $app->get('/alunni/{id}', "AlunniController:view");
 
-// curl -X POST http://localhost:8080/alunni/2 -H "Content-Type: application/json" -d '{"nome": "ciccio"}'
+// curl -X POST http://localhost:8080/alunni -H "Content-Type: application/json" -d '{"nome": "ciccio"}'
 $app->post('/alunni', "AlunniController:create");
 
 // curl -X PUT http://localhost:8080/alunni/2 -H "Content-Type: application/json" -d '{"nome": "franko"}'
