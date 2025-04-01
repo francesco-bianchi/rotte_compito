@@ -7,10 +7,9 @@ class AlunniController
   public function index(Request $request, Response $response, $args){
     $mysqli_connection = new MySQLi('my_mariadb', 'root', 'ciccio', 'scuola');
     
-    $query = "SELECT * FROM alunni";
-    if(isset($_GET["search"]) || isset($_GET["sortCol"])){
+      $query = "SELECT * FROM alunni";
       $parametri = $request->getQueryParams();
-
+      
       if(isset($_GET["search"])){
         $search = $parametri['search'];
         $query .= " WHERE nome LIKE '%$search%' OR cognome LIKE '%$search%'";
@@ -23,18 +22,13 @@ class AlunniController
 
       $result = $mysqli_connection->query($query);
 
-      if($result){
-        $response->getBody()->write(json_encode(array("message"=>"success")));
-        $status = 200;
-      }
-      else{
-        $response->getBody()->write(json_encode(array("message"=> $mysqli_connection->error)));
-        $status = 404;
-      }
+    if($result){
+      $response->getBody()->write(json_encode(array("message"=>"success")));
+      $status = 200;
     }
     else{
-      $result = $mysqli_connection->query($query);
-      $status = 200;
+      $response->getBody()->write(json_encode(array("message"=> $mysqli_connection->error)));
+      $status = 404;
     }
     
     $results = $result->fetch_all(MYSQLI_ASSOC);
