@@ -23,3 +23,5 @@ $app->delete('/alunni/{id}', "AlunniController:destroy");
 
 
 $app->run();
+
+//MY_UID=$(id -u) MY_GID=$(id -g) docker-compose up -d  --> avviareMY_UID=$(id -u) MY_GID=$(id -g) docker-compose up -d container docker
